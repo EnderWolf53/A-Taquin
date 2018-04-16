@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -94,8 +95,8 @@ int main(int argc, char ** argv)
 				//création du premier taquin
 				Taquin * pTaquin = (Taquin*)malloc(sizeof(Taquin));//creation taquin 1
 				pTaquin->plateau = NULL;
-				pTaquin->hauteur = NULL;
-				pTaquin->largeur = NULL;
+				pTaquin->hauteur = 0;
+				pTaquin->largeur = 0;
 				pTaquin->x = 0;
 				pTaquin->y = 0;
 
@@ -103,8 +104,8 @@ int main(int argc, char ** argv)
 
 				Taquin * pTaquin2 = (Taquin*)malloc(sizeof(Taquin));//creation taquin 2
 				pTaquin2->plateau = NULL;
-				pTaquin2->hauteur = NULL;
-				pTaquin2->largeur = NULL;
+				pTaquin2->hauteur = 0;
+				pTaquin2->largeur = 0;
 				pTaquin2->x = 0;
 				pTaquin2->y = 0;
 				
@@ -112,6 +113,45 @@ int main(int argc, char ** argv)
 
 				copyTaquin(pTaquin, pTaquin2); //test de copie
 				equalTaquin(pTaquin, pTaquin2);//test de equal
+
+				int offset = 100;
+
+				printf("TAKIN 1 : \n");
+				displayTaquin(pTaquin, offset);//test display
+
+
+				//////////////////////attribution touche//////////////////////////
+
+				char keyword = 0;
+				deplacement d = AUCUN;
+
+
+				while (keyword != '9')
+				{
+					scanf("%c", &keyword);
+
+					if (keyword == 'z')
+						d = HAUT;
+
+					if (keyword == 's')
+						d = BAS;
+
+					if (keyword == 'q')
+						d = GAUCHE;
+
+					if (keyword == 'd')
+						d = DROITE;
+
+					moveTaquin(pTaquin, d);
+
+				}
+				
+				
+
+				
+
+
+
 
 				//testfin---------------------------------------------------------------------------------------------------------//
 
