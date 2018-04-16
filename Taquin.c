@@ -12,6 +12,33 @@
 // Fonction pour copier un plateau de taquin pSrc vers pDest
 int copyTaquin(Taquin * pSrc, Taquin * pDest)
 {
+	int i, j;
+
+	if (pSrc != NULL)//si le taquin de départ existe
+	{
+
+		printf("\n copie "); //
+
+		pDest->hauteur = pSrc->hauteur;//attribution de la hauteur, largeur du plateau Src au plateau Des 
+		pDest->largeur = pSrc->largeur;
+
+		for (i = 0; i < pDest->hauteur; i++) //on attribut a chaque cases du plateau Dest la valeur des cases du plateau Src
+		{
+			for (j = 0; j < pDest->largeur; j++)
+			{
+				pDest->plateau[i][j] = pSrc->plateau[i][j];
+				//test début
+				printf("%d " , pDest->plateau[i][j]);
+				//test fin
+
+			}
+		}
+
+		pDest->x = pSrc->x;//on attribut les coordonnées de la case vide
+		pDest->y = pSrc->y;
+
+	}
+	
 	return 1;
 }
 
@@ -20,6 +47,37 @@ int copyTaquin(Taquin * pSrc, Taquin * pDest)
 // -1 si il y a une erreur au passage des paramètres
 int equalTaquin(Taquin * pTaquin1, Taquin * pTaquin2)
 {
+	printf("\n egalite ");
+
+	int CaseValide = 0;
+
+	if (pTaquin1 == NULL)
+		return -1;
+	if (pTaquin2 == NULL)
+		return -1;
+
+	if (pTaquin1 != NULL && pTaquin2 != NULL)
+	{
+		for (int i = 0; i < pTaquin1->hauteur; i++)
+		{
+			for (int j = 0; j < pTaquin2->largeur; j++)
+			{
+				if (pTaquin1->plateau[i][j] == pTaquin1->plateau[i][j])
+					CaseValide++;
+			}
+		}
+
+	}
+
+	if (CaseValide == pTaquin1->hauteur * pTaquin1->largeur)
+	{
+		printf("les 2 taquins sont egaux");//test
+			return 1;
+	}
+			
+	
+
+	
 	return 0;
 }
 
@@ -77,6 +135,7 @@ int createTaquin(Taquin * pTaquin, unsigned char hauteur, unsigned char largeur)
 		if(!initTaquin(pTaquin)) return 0;
 	}
 
+
 	return 1;
 }
 
@@ -84,12 +143,29 @@ int createTaquin(Taquin * pTaquin, unsigned char hauteur, unsigned char largeur)
 // Fonction qui initialise le taquin
 int initTaquin(Taquin * pTaquin)
 {
+	printf("\n init ");
+
+	for (int i = 0; i < pTaquin->hauteur; i++)
+	{
+		for (int j = 0; j < pTaquin->largeur; j++)
+		{
+			pTaquin->plateau[i][j] = pTaquin->largeur * i + j; //pour chaque case on attribut un identifiant de 0 a 8.
+			printf("%d ", pTaquin->plateau[i][j]);
+		}
+	}
+	
 	return 1;
 }
 
 // Fonction qui mélange le taquin en effectuant entre minRandom et maxRandom coups aléatoires
 int mixTaquin(Taquin * pTaquin, int minRandom, int maxRandom)
 {
+	printf("mix taquin");
+
+	int rand_a_b(int minRandom, int maxRandom);
+
+
+
 	return 1;
 }
 
