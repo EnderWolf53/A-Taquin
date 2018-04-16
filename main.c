@@ -1,13 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "vld.h"
 #include "taquinSDL.h"
 
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 
-//Pense Bête : Heuristique = Somme(DistanceManatthan(Cases[i][j])) pour tout i, j.
 
 void pause()
 {
@@ -87,6 +85,41 @@ int main(int argc, char ** argv)
 				if(argc>=4) strcpy_s(taquinFile,1024,argv[3]);
 				printf("fichier BMP : %s\n",taquinFile);
 				printf("aleatoire : [%d;%d]\n",minRandom,maxRandom);
+
+
+
+				//test---------------------------------------------------------------------------------------------------------//
+				printf("\n");
+
+				//création du premier taquin
+				Taquin * pTaquin = (Taquin*)malloc(sizeof(Taquin));//creation taquin 1
+				pTaquin->plateau = NULL;
+				pTaquin->hauteur = NULL;
+				pTaquin->largeur = NULL;
+				pTaquin->x = 0;
+				pTaquin->y = 0;
+
+				createTaquin(pTaquin, hauteur, largeur);
+
+				Taquin * pTaquin2 = (Taquin*)malloc(sizeof(Taquin));//creation taquin 2
+				pTaquin2->plateau = NULL;
+				pTaquin2->hauteur = NULL;
+				pTaquin2->largeur = NULL;
+				pTaquin2->x = 0;
+				pTaquin2->y = 0;
+				
+				createTaquin(pTaquin2, hauteur, largeur);
+
+				copyTaquin(pTaquin, pTaquin2); //test de copie
+				equalTaquin(pTaquin, pTaquin2);//test de equal
+
+				//testfin---------------------------------------------------------------------------------------------------------//
+
+
+
+
+
+
 
 
 				// En mode console
