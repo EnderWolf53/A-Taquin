@@ -25,21 +25,30 @@ ptrListAStar createNodeList(Taquin * pTaquin, int gValue, int fValue, deplacemen
 	return Anode;
 }
 
+int fpg(ptrListAStar called)
+{
+	if (!called)
+	{
+		return -1;
+	}
+	return (called->DfromStart + called->Heur);
+}
+
 // Insertion dans la liste de façon triée ou non (F+G)
 // si on passe le paramètre tri à 0, on insère en tête de liste
 int insertList(ptrListAStar * ppHead, ptrListAStar pNode, int tri)
 {
 	if (!ppHead)
 	{
-		return 1;
+		return -1;
 	}
 	if (!(*ppHead))
 	{
-		return 1;
+		return -1;
 	}
 	if (!pNode)
 	{
-		return 1;
+		return -1;
 	}
 	if (tri == 0) //insert en tête
 	{
@@ -48,7 +57,7 @@ int insertList(ptrListAStar * ppHead, ptrListAStar pNode, int tri)
 	}
 	else //insert selon F+G
 	{
-		if (pNode->DfromStart + pNode->Heur > (*ppHead)->DfromStart + (*ppHead)->Heur)
+		if (fpg(pNode) > fpg((*ppHead)))
 		{
 			pNode->NextNode = (*ppHead);
 			(*ppHead)->LastNode = pNode;
@@ -60,9 +69,15 @@ int insertList(ptrListAStar * ppHead, ptrListAStar pNode, int tri)
 			{
 				(*ppHead)->NextNode = pNode;
 			}
-			else if (pNode->DfromStart + pNode->Heur > (*ppHead)->NextNode->DfromStart + (*ppHead)->NextNode->Heur)
+			else if (fpg(pNode) > fpg((*ppHead)->NextNode))
 			{
+				(*ppHead)->NextNode->LastNode = pNode;
+				pNode->NextNode = (*ppHead)->NextNode;
 				(*ppHead)->NextNode = pNode;
+			}
+			else
+			{
+				return insertList(&((*ppHead)->NextNode), pNode, tri);
 			}
 		}
 	}
@@ -73,7 +88,39 @@ int insertList(ptrListAStar * ppHead, ptrListAStar pNode, int tri)
 // Retourne le noeud prélevé
 ptrListAStar popList(ptrListAStar * ppHead)
 {
-	return NULL;
+	if (!ppHead)
+	{
+		return NULL;
+	}
+	if (!(*ppHead))
+	{
+		return NULL;
+	}
+	ptrListAStar poped = (ptrListAStar)malloc(sizeof(ListAStar));
+	poped->Current = (*ppHead)->Current;
+	poped->DfromStart = (*ppHead)->DfromStart;
+	poped->Heur = (*ppHead)->Heur;
+	poped->LastD = (*ppHead)->LastD;
+	poped->LastNode = (*ppHead)->LastNode;
+	poped->NextNode = (*ppHead)->NextNode;
+	if (!(*ppHead)->NextNode)
+	{
+		free((*ppHead));
+	}
+	else
+	{
+		ptrListAStar tmp = (ptrListAStar)malloc(sizeof(ListAStar));
+		tmp->Current = (*ppHead)->NextNode->Current;
+		tmp->DfromStart = (*ppHead)->NextNode->DfromStart;
+		tmp->Heur = (*ppHead)->NextNode->Heur;
+		tmp->LastD = (*ppHead)->NextNode->LastD;
+		tmp->LastNode = (*ppHead)->NextNode->LastNode;
+		tmp->NextNode = (*ppHead)->NextNode->NextNode;
+		free((*ppHead)->NextNode);
+		free((*ppHead));
+		(*ppHead) = tmp;
+	}
+	return poped;
 }
 
 // fonction qui retourne le noeud dans lequel on trouve le taquin passé en paramètre (pointeur sur le pointeur dans la liste)
