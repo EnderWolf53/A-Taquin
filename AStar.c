@@ -16,8 +16,8 @@ ptrListAStar createNodeList(Taquin * pTaquin, int gValue, int fValue, deplacemen
 		return NULL;
 	}
 	ptrListAStar Anode = (ptrListAStar)malloc(sizeof(ListAStar));
-	Anode->DfromStart = gValue;
-	Anode->Heur = fValue;
+	Anode->DfromStart = fValue;
+	Anode->Heur = gValue;
 	Anode->Current = pTaquin;
 	Anode->LastD = d;
 	Anode->LastNode = pPrevPlay;
@@ -124,8 +124,29 @@ ptrListAStar popList(ptrListAStar * ppHead)
 }
 
 // fonction qui retourne le noeud dans lequel on trouve le taquin passé en paramètre (pointeur sur le pointeur dans la liste)
+
 ptrListAStar * isInList(ptrListAStar * ppHead, Taquin * pTaquin)
 {
+	if (!ppHead)
+	{
+		return NULL;
+	}
+	if (!(*ppHead))
+	{
+		return NULL;
+	}
+	if (!pTaquin)
+	{
+		return NULL;
+	}
+	if (equalTaquin((*ppHead)->Current, pTaquin))
+	{
+		return (*ppHead);
+	}
+	else
+	{
+		return isInList(&((*ppHead)->NextNode), pTaquin);
+	}
 	return NULL;
 }
 
@@ -133,7 +154,21 @@ ptrListAStar * isInList(ptrListAStar * ppHead, Taquin * pTaquin)
 // si on met displayFGH à 0 les valeur de F, G et H ne sont pas affichées
 int displayList(ptrListAStar pHead, int displayFGH)
 {
-	return 1;
+	int error;
+	if (!pHead)
+	{
+		return -1;
+	}
+	if (displayFGH)
+	{
+		printf("F = %d, G = %d, H = %d\n", pHead->DfromStart, pHead->Heur, pHead->DfromStart + pHead->Heur);
+	}
+	error = displayTaquin(pHead->Current, 0);
+	if (!(pHead->NextNode))
+	{
+		return 0;
+	}
+	return displayList(pHead->NextNode, displayFGH);
 }
 
 // Fonction pour résoudre le taquin en utilisant l'algorithme A*
