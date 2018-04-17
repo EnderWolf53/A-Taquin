@@ -226,6 +226,7 @@ int mixTaquin(Taquin * pTaquin, int minRandom, int maxRandom)
 // Fonction qui permet de bouger une pièce du taquin (en bougeant la case vide)
 int moveTaquin(Taquin * pTaquin, deplacement d)
 {
+
 	if (pTaquin == NULL)//error
 	{
 		printf("error pTaquin n'existe pas\n");
@@ -246,7 +247,7 @@ int moveTaquin(Taquin * pTaquin, deplacement d)
 
 		pTaquin->plateau[pTaquin->x][pTaquin->y];//la case vide
 		Tmp = pTaquin->plateau[pTaquin->x - 1][pTaquin->y];//la case du haut
-		pTaquin->plateau[pTaquin->x-1][pTaquin->y] = pTaquin->plateau[pTaquin->x][pTaquin->y];//la case de haut devient la case vide
+		pTaquin->plateau[pTaquin->x-1][pTaquin->y] = 0;//la case de haut devient la case vide
 		pTaquin->plateau[pTaquin->x][pTaquin->y] = Tmp;//la case vide devient la case du haut
 		
 		pTaquin->x--;
@@ -261,9 +262,8 @@ int moveTaquin(Taquin * pTaquin, deplacement d)
 			return 0;
 		}
 
-		pTaquin->plateau[pTaquin->x][pTaquin->y];//la case vide
 		Tmp = pTaquin->plateau[pTaquin->x + 1][pTaquin->y];//la case du bas
-		pTaquin->plateau[pTaquin->x + 1][pTaquin->y] = pTaquin->plateau[pTaquin->x][pTaquin->y];//la case de bas devient la case vide
+		pTaquin->plateau[pTaquin->x + 1][pTaquin->y] = 0;//la case de bas devient la case vide
 		pTaquin->plateau[pTaquin->x][pTaquin->y] = Tmp;//la case vide devient la case du bas
 
 		pTaquin->x++;
@@ -277,9 +277,8 @@ int moveTaquin(Taquin * pTaquin, deplacement d)
 			return 0;
 		}
 
-		pTaquin->plateau[pTaquin->x][pTaquin->y];//la case vide
 		Tmp = pTaquin->plateau[pTaquin->x][pTaquin->y-1];//la case de gauche
-		pTaquin->plateau[pTaquin->x][pTaquin->y-1] = pTaquin->plateau[pTaquin->x][pTaquin->y];//la case de gauche devient la case vide
+		pTaquin->plateau[pTaquin->x][pTaquin->y-1] = 0;//la case de gauche devient la case vide
 		pTaquin->plateau[pTaquin->x][pTaquin->y] = Tmp;//la case vide devient la case de gauche
 
 		pTaquin->y--;
@@ -293,15 +292,14 @@ int moveTaquin(Taquin * pTaquin, deplacement d)
 			return 0;
 		}
 
-		pTaquin->plateau[pTaquin->x][pTaquin->y];//la case vide
+
 		Tmp = pTaquin->plateau[pTaquin->x][pTaquin->y+1];//la case de droite
-		pTaquin->plateau[pTaquin->x][pTaquin->y+1] = pTaquin->plateau[pTaquin->x][pTaquin->y];//la case de droite devient la case vide
+		pTaquin->plateau[pTaquin->x][pTaquin->y+1] = 0;//la case de droite devient la case vide
 		pTaquin->plateau[pTaquin->x][pTaquin->y] = Tmp;//la case vide devient la case de droite
 
 		pTaquin->y++;
 	}
 
-	
 	
 	return 1;
 }
@@ -454,6 +452,9 @@ int gameLoop(int hauteur, int largeur, int minRandom, int maxRandom)
 
 		if (keyword == 'd')
 			d = DROITE;
+
+		if (keyword == 'w')
+			d = cancelMove(d);
 			
 		//system("cls");
 
