@@ -217,7 +217,7 @@ int moveTaquin(Taquin * pTaquin, deplacement d)
 
 	if (d == BAS)
 	{
-		if (pTaquin->x + 1 > pTaquin->hauteur) // test d'erreur
+		if (pTaquin->x + 1 >= pTaquin->hauteur) // test d'erreur
 		{
 			printf("impossibe de deplacer vers le bas\n");
 			return -1;
@@ -233,7 +233,7 @@ int moveTaquin(Taquin * pTaquin, deplacement d)
 
 	if (d == GAUCHE)
 	{
-		if (pTaquin->x - 1 < 0) // test d'erreur
+		if (pTaquin->y - 1 < 0) // test d'erreur
 		{
 			printf("impossibe de deplacer vers la gauche\n");
 			return -1;
@@ -249,7 +249,7 @@ int moveTaquin(Taquin * pTaquin, deplacement d)
 	
 	if (d == DROITE)
 	{
-		if (pTaquin->x + 1 > pTaquin->largeur) // test d'erreur
+		if (pTaquin->y + 1 >= pTaquin->largeur) // test d'erreur
 		{
 			printf("impossibe de deplacer vers la droite\n");
 			return -1;
@@ -362,7 +362,7 @@ int gameLoop(int hauteur, int largeur, int minRandom, int maxRandom)
 	{
 
 		printf("\n");
-
+		keyword = 0;
 		//création du premier taquin
 		Taquin * pTaquin = (Taquin*)malloc(sizeof(Taquin));//creation taquin 1
 		pTaquin->plateau = NULL;
@@ -412,7 +412,7 @@ int gameLoop(int hauteur, int largeur, int minRandom, int maxRandom)
 				d = DROITE;
 			
 			moveTaquin(pTaquin, d);
-
+			printf("%d %d\n", pTaquin->x, pTaquin->y);
 		}
 
 		fin = endTaquin(pTaquin);
