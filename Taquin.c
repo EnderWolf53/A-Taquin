@@ -309,7 +309,18 @@ int moveTaquin(Taquin * pTaquin, deplacement d)
 // Fonction qui renvoie le déplacement à effectuer pour annuler le déplacement donné en paramètre
 deplacement cancelMove(deplacement d)
 {
-	
+	switch (d)
+	{
+	case GAUCHE:
+		return DROITE;
+	case DROITE:
+		return GAUCHE;
+	case BAS:
+		return HAUT;
+	case HAUT:
+		return BAS;
+	}
+
 	return AUCUN;
 }
 
@@ -370,9 +381,10 @@ int displayTaquin(Taquin * pTaquin, int offset)
 // Fonction pour libérer les zones mémoires occupées par un taquin
 int freeTaquin(Taquin * pTaquin)
 {
+
 	return 1;
 }
-// Boucle de jeu 
+//Boucle de jeu
 
 
 void viderBuffer()
@@ -383,7 +395,6 @@ void viderBuffer()
 		c = getchar();
 	}
 }
-
 
 int gameLoop(int hauteur, int largeur, int minRandom, int maxRandom)
 {
