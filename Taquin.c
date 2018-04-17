@@ -166,10 +166,11 @@ int mixTaquin(Taquin * pTaquin, int minRandom, int maxRandom)
 {
 	int mix, D, i;
 	deplacement d;
+	srand(time(NULL));
 	mix = rand() % ((1 + maxRandom) - minRandom) + minRandom; // ajout d'aléatoire
 	for (i = 0; i < mix; i++)
 	{
-		D = rand() % 4;
+		D = rand() % 4; //D est obtient une valeur entre 0 et 3 afin de générer un déplacement aléatoire
 		if (D == 0)
 			d = HAUT;
 		else if (D == 1)
@@ -285,11 +286,11 @@ int endTaquin(Taquin * pTaquin)
 	}
 
 
-	unsigned char solution = 0;
+	char solution = 0;
 	int nbbonneCase = 0;
 	for (int i = 0; i < pTaquin->hauteur; i++)
 	{
-		for (int j = 0; i < pTaquin->largeur; i++)
+		for (int j = 0; j < pTaquin->largeur; j++)
 		{
 			if (pTaquin->plateau[i][j] == solution) //si la case parcouru est la bonne case alors la variable nbbonneCase s'incrémente de 1.
 				nbbonneCase++;
@@ -300,7 +301,7 @@ int endTaquin(Taquin * pTaquin)
 
 	if (nbbonneCase == pTaquin->hauteur*pTaquin->largeur)//si le nombre de bonne case est égale a toute les cases du taquin alors le taquin est résolu
 	{
-		printf("BRAVO VOUS AVEZ RESOLU LE QUATIN\n");
+		printf("\nBRAVO VOUS AVEZ RESOLU LE QUATIN\n");
 		return 1;
 	}
 
@@ -352,70 +353,67 @@ int gameLoop(int hauteur, int largeur, int minRandom, int maxRandom)
 
 	char keyword = 0;
 	deplacement d = AUCUN;
-
 	int fin = 0;//fin = 0, si fin est vraiment la fin alors fin est a 1
+	int offset = 100;
 
+	printf("\n");
+	//création du premier taquin
+	Taquin * pTaquin = (Taquin*)malloc(sizeof(Taquin));//creation taquin 1
+	pTaquin->plateau = NULL;
+	pTaquin->hauteur = hauteur;
+	pTaquin->largeur = largeur;
+	pTaquin->x = 0;
+	pTaquin->y = 0;
+
+	createTaquin(pTaquin, hauteur, largeur);
+
+	Taquin * pTaquin2 = (Taquin*)malloc(sizeof(Taquin));//creation taquin 2
+	pTaquin2->plateau = NULL;
+	pTaquin2->hauteur = hauteur;
+	pTaquin2->largeur = largeur;
+	pTaquin2->x = 0;
+	pTaquin2->y = 0;
+
+	createTaquin(pTaquin2, hauteur, largeur);
+
+	copyTaquin(pTaquin, pTaquin2); //test de copie
+	equalTaquin(pTaquin, pTaquin2);//test de equal
+
+	printf("TAKIN 1 : \n");
+	displayTaquin(pTaquin, offset);//test display
+
+
+	//mixTaquin(pTaquin, minRandom, maxRandom);//mélange du takin
 	
 
 	// BOUCLE DE JEU ! A DEVELOPPER
 	while (fin != 1)
 	{
-
-		printf("\n");
-		keyword = 0;
-		//création du premier taquin
-		Taquin * pTaquin = (Taquin*)malloc(sizeof(Taquin));//creation taquin 1
-		pTaquin->plateau = NULL;
-		pTaquin->hauteur = hauteur;
-		pTaquin->largeur = largeur;
-		pTaquin->x = 0;
-		pTaquin->y = 0;
-
-		createTaquin(pTaquin, hauteur, largeur);
-
-		Taquin * pTaquin2 = (Taquin*)malloc(sizeof(Taquin));//creation taquin 2
-		pTaquin2->plateau = NULL;
-		pTaquin2->hauteur = hauteur;
-		pTaquin2->largeur = largeur;
-		pTaquin2->x = 0;
-		pTaquin2->y = 0;
-
-		createTaquin(pTaquin2, hauteur, largeur);
-
-		copyTaquin(pTaquin, pTaquin2); //test de copie
-		equalTaquin(pTaquin, pTaquin2);//test de equal
-
-		int offset = 100;
-
-		printf("TAKIN 1 : \n");
-		displayTaquin(pTaquin, offset);//test display
-
-
-		//////////////////////attribution touche//////////////////////////
-
 		
-		while (keyword != '9')
-		{
-			scanf("%c", &keyword);
-			viderBuffer();
+		keyword = 0;
+				
+		scanf("%c", &keyword);//action
+		viderBuffer();
 
-			if (keyword == 'z')
-				d = HAUT;
+		if (keyword == 'z')
+			d = HAUT;
 
-			if (keyword == 's')
-				d = BAS;
+		if (keyword == 's')
+			d = BAS;
 
-			if (keyword == 'q')
-				d = GAUCHE;
+		if (keyword == 'q')
+			d = GAUCHE;
 
-			if (keyword == 'd')
-				d = DROITE;
+		if (keyword == 'd')
+			d = DROITE;
 			
-			moveTaquin(pTaquin, d);
-			printf("%d %d\n", pTaquin->x, pTaquin->y);
-		}
+		system("cls");
+
+		moveTaquin(pTaquin, d);
 
 		fin = endTaquin(pTaquin);
+
+		
 
 	}
 	return 1;
