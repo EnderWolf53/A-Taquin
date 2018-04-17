@@ -188,5 +188,29 @@ int solveTaquin(Taquin *pTaquin, deplacement ** pTabDeplacement, unsigned long *
 // fonction d'évaluation pour la résolution avec AStar
 int h(Taquin * pTaquin)
 {
-	return 0;
+	if (!pTaquin)
+	{
+		return INT_MAX;
+	}
+	int i, j, error, mana, th, tl, dx, dy;
+	mana = 0;
+	Taquin* Sample = (Taquin*)malloc(sizeof(Taquin));
+	Sample->hauteur = 0;
+	Sample->largeur = 0;
+	Sample->plateau = NULL;
+	Sample->x = 0;
+	Sample->y = 0;
+	error = createTaquin(Sample, pTaquin->hauteur, pTaquin->largeur);
+	for (i = 0; i < pTaquin->hauteur; i++)
+	{
+		for (j = 0; j < pTaquin->largeur; j++)
+		{
+			th = pTaquin->plateau[i][j] / pTaquin->largeur;
+			tl = pTaquin->plateau[i][j] % pTaquin->largeur;
+			dx = abs(i - th);
+			dy = abs(j - tl);
+			mana += dx + dy;
+		}
+	}
+	return mana;
 }
