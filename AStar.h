@@ -24,6 +24,7 @@ struct sListAStar {
 	int Heur;							// Evaluation de la distance à parcourir entre l'état initial et l'état final
 	Taquin* Current;					// Taquin contenu dans le noeud courant
 	deplacement LastD;					// dernier déplacement effectué pour arriver à ce taquin
+	ListAStar* LastPlay;
 	ListAStar* LastNode;				// Pointeur vers le noeud correspondant à l'étape précédente dans la solution
 	ListAStar* NextNode;				// Pointeur vers le noeud suivant (liste simplement chaînée)
 };
