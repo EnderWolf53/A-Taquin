@@ -62,20 +62,34 @@ int createTaquinSDL(TaquinSDL * pTaquinSDL,int hauteur, int largeur, char * path
 	
 }
 
-
 int displayCaseTaquin(TaquinSDL * pTaquinSDL,unsigned char caseTaquin, SDL_Rect * pDest, int x, int y, int refresh)
 {
 	// on définit où on veut la dessiner
+	SDL_Rect zoneCoupe;
 
+	zoneCoupe.x = (caseTaquin%pTaquinSDL->taquin.largeur) * pTaquinSDL->resX ;//on recherche les coordonnées de la case a découper
+	zoneCoupe.y = ((char)caseTaquin/pTaquinSDL->taquin.hauteur) * pTaquinSDL->resY;
+
+	zoneCoupe.w = pTaquinSDL->resX;
+	zoneCoupe.h = pTaquinSDL->resY;
+
+	//printf(" %d ", caseTaquin);
+
+	SDL_BlitSurface(pTaquinSDL->pFond, &zoneCoupe , pTaquinSDL->pWindow, pDest);
 
 	// Si la case n'est pas vide ...
+	if (!caseTaquin)
+		return 0;
+
 	// on calcule où est la case "caseTaquin" dans l'image initiale pour -par la suite - venir découper la zone qui correspond à la case
-	
 	// ... 
+	
+	
+	
 
 	// On dessine la case dans la fenêtre (en découpant dans l'image initiale avec la zone définie ci-dessus)
-
-	if(refresh) SDL_UpdateRect(pTaquinSDL->pWindow,pDest->x,pDest->y,pDest->w,pDest->h);
+		
+	SDL_UpdateRect(pTaquinSDL->pWindow,pDest->x,pDest->y,pDest->w,pDest->h);
 
 	return 1;
 }
@@ -86,14 +100,36 @@ int displayTaquinSDL(TaquinSDL * pTaquinSDL)
 	// Test pour vérifier que les données passées ne sont pas corrompues
 	if(!pTaquinSDL || !pTaquinSDL->taquin.plateau || !pTaquinSDL->pWindow ) return 0;
 
+
 	// On dessine les cases une par une en allant découper l'image de fond avec un SDL_Rect
 	{
 
+		SDL_Rect caseTaquin;
 
 		// On dessine le taquin terminé pour afficher quelque chose mais il faudra le changer
-		SDL_BlitSurface(pTaquinSDL->pFond,NULL,pTaquinSDL->pWindow,NULL);
 
-		// ...
+		for (int i = 0; i < pTaquinSDL->taquin.hauteur; i++)//affiche toutes les cases du taquin sauf le vide
+		{
+			for (int j = 0; j < pTaquinSDL->taquin.largeur; j++)
+			{
+				caseTaquin.y = i * pTaquinSDL->resX;
+				caseTaquin.x = j * pTaquinSDL->resY;
+
+				caseTaquin.w = pTaquinSDL->resX;
+				caseTaquin.h = pTaquinSDL->resY;
+
+				displayCaseTaquin(pTaquinSDL, pTaquinSDL->taquin.plateau[i][j], &caseTaquin, 0, 0, 1);
+				
+			
+							
+			}
+		}
+
+
+
+		
+
+		
 
 
 
@@ -111,11 +147,26 @@ int gameLoopSDL(int hauteur,int largeur, char * pathBMPfile, int minRandom, int 
 {
 	int end = 0;
 	TaquinSDL t;
+	//TODO creer taquin.
+	Taquin * pTaquin = (Taquin*)malloc(sizeof(Taquin));//creation taquin 1
+	pTaquin->plateau = NULL;
+	pTaquin->hauteur = hauteur;
+	pTaquin->largeur = largeur;
+	pTaquin->x = 0;
+	pTaquin->y = 0;
+	createTaquin(pTaquin, hauteur, largeur);
+
+	t.taquin = *pTaquin;
 
 	srand((unsigned)time(NULL));
 
 	// On crée le taquin et la fenêtre pour le dessiner
 	if(!createTaquinSDL(&t,hauteur,largeur,pathBMPfile)) return 0;
+
+
+	
+	
+		
 
 
 	// On boucle sur le jeu tant qu'on a pas demandé de quitter
@@ -128,8 +179,8 @@ int gameLoopSDL(int hauteur,int largeur, char * pathBMPfile, int minRandom, int 
 
 		// On affiche le taquin mélangé
 		displayTaquinSDL(&t);
-
 		end = 0;
+
 
 		// On boucle tant que la solution n'a pas été trouvée
 		while(!end )
@@ -274,7 +325,11 @@ int gameLoopSDL(int hauteur,int largeur, char * pathBMPfile, int minRandom, int 
 	// On libère le taquin et les surfaces SDL
 	freeTaquinSDL(&t);
 
+
 	/* Shut them both down */
+
+
+
 	SDL_Quit();
 
 
