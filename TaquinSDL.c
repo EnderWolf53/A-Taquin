@@ -103,18 +103,6 @@ int displayCaseTaquin(TaquinSDL * pTaquinSDL,unsigned char caseTaquin, SDL_Rect 
 int displayTaquinSDL(TaquinSDL * pTaquinSDL)
 {
 
-	//on creer un petit carré noire
-	SDL_Rect pos;
-	pos.x = 0;
-	pos.y = 0;
-	pos.w = 50;
-	pos.h = 90;
-	SDL_FillRect(pTaquinSDL->pWindow, &pos, SDL_MapRGB(pTaquinSDL->pWindow->format, 255, 255, 255));
-
-
-
-
-
 
 	// Test pour vérifier que les données passées ne sont pas corrompues
 	if(!pTaquinSDL || !pTaquinSDL->taquin.plateau || !pTaquinSDL->pWindow ) return 0;
