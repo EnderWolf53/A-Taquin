@@ -87,78 +87,31 @@ int main(int argc, char ** argv)
 				printf("fichier BMP : %s\n",taquinFile);
 				printf("aleatoire : [%d;%d]\n",minRandom,maxRandom);
 
-
-
-				/*/test---------------------------------------------------------------------------------------------------------//
-				printf("\n");
-
-				//création du premier taquin
-				Taquin * pTaquin = (Taquin*)malloc(sizeof(Taquin));//creation taquin 1
-				pTaquin->plateau = NULL;
-				pTaquin->hauteur = 0;
-				pTaquin->largeur = 0;
-				pTaquin->x = 0;
-				pTaquin->y = 0;
-
-				createTaquin(pTaquin, hauteur, largeur);
-
-				Taquin * pTaquin2 = (Taquin*)malloc(sizeof(Taquin));//creation taquin 2
-				pTaquin2->plateau = NULL;
-				pTaquin2->hauteur = 0;
-				pTaquin2->largeur = 0;
-				pTaquin2->x = 0;
-				pTaquin2->y = 0;
 				
-				createTaquin(pTaquin2, hauteur, largeur);
+				
 
-				copyTaquin(pTaquin, pTaquin2); //test de copie
-				equalTaquin(pTaquin, pTaquin2);//test de equal
-
-				int offset = 100;
-
-				printf("TAKIN 1 : \n");
-				displayTaquin(pTaquin, offset);//test display
-
-
-				//////////////////////attribution touche//////////////////////////
-
-				char keyword = 0;
-				deplacement d = AUCUN;
-
-
-				while (keyword != '9')
+				printf("Voulez vous de la SDL? (y = yes) (n = no) \n");
+				char vue;
+				scanf("%c", &vue);
+				switch (vue)
 				{
-					scanf("%c", &keyword);
-
-					if (keyword == 'z')
-						d = HAUT;
-
-					if (keyword == 's')
-						d = BAS;
-
-					if (keyword == 'q')
-						d = GAUCHE;
-
-					if (keyword == 'd')
-						d = DROITE;
-
-					moveTaquin(pTaquin, d);
-
+				case 'y' :
+					// En mode graphique
+					printf("Vous avez choisi d'utiliser la SDL\n");
+					printf("Utilisez les fleches directionnels pour vous deplacer.\n");
+					printf("Vous pouvez aussi utlisez un A* si vous ne réussissez vraiment pas ce taquin pour cela il suffit de cliquer sur F1.\n");
+					gameLoopSDL(hauteur, largeur, taquinFile, minRandom, maxRandom);//SDL
+					break;
+				case 'n' :
+					// En mode console
+					gameLoop(hauteur, largeur, minRandom, maxRandom);//le terminal
 				}
 				
-				//testfin---------------------------------------------------------------------------------------------------------/*/
 
+				
+				
+				
 
-				gameLoop(hauteur, largeur, minRandom, maxRandom);
-
-
-
-
-
-				// En mode console
-				//gameLoop(hauteur,largeur, minRandom,maxRandom);
-				// En mode graphique
-				gameLoopSDL(hauteur,largeur,taquinFile, minRandom, maxRandom);
 
 			}
 

@@ -102,8 +102,6 @@ int displayCaseTaquin(TaquinSDL * pTaquinSDL,unsigned char caseTaquin, SDL_Rect 
 // fonction pour rendre le taquin dans son état actuel
 int displayTaquinSDL(TaquinSDL * pTaquinSDL)
 {
-
-
 	// Test pour vérifier que les données passées ne sont pas corrompues
 	if(!pTaquinSDL || !pTaquinSDL->taquin.plateau || !pTaquinSDL->pWindow ) return 0;
 
@@ -111,7 +109,7 @@ int displayTaquinSDL(TaquinSDL * pTaquinSDL)
 	// On dessine les cases une par une en allant découper l'image de fond avec un SDL_Rect
 	{
 
-		SDL_Rect caseTaquin;
+		SDL_Rect caseTaquin;//on creer la case de destination
 
 		// On dessine le taquin terminé pour afficher quelque chose mais il faudra le changer
 
@@ -135,6 +133,7 @@ int displayTaquinSDL(TaquinSDL * pTaquinSDL)
 					pos.h = pTaquinSDL->resY;
 					SDL_FillRect(pTaquinSDL->pWindow, &pos, SDL_MapRGB(pTaquinSDL->pWindow->format, 0, 0, 0));
 				}else
+
 				displayCaseTaquin(pTaquinSDL, pTaquinSDL->taquin.plateau[i][j], &caseTaquin, 0, 0, 1);
 				
 			
@@ -180,7 +179,7 @@ int gameLoopSDL(int hauteur,int largeur, char * pathBMPfile, int minRandom, int 
 	// On crée le taquin et la fenêtre pour le dessiner
 	if(!createTaquinSDL(&t,hauteur,largeur,pathBMPfile)) return 0;
 
-
+	mixTaquin(&(t.taquin), minRandom, maxRandom);
 	
 	
 		
@@ -192,12 +191,13 @@ int gameLoopSDL(int hauteur,int largeur, char * pathBMPfile, int minRandom, int 
 		int tick = SDL_GetTicks();
 
 		// On mélange le taquin
-		mixTaquin(&(t.taquin), minRandom, maxRandom);
+		
 
 		// On affiche le taquin mélangé
 		displayTaquinSDL(&t);
 		end = 0;
 
+		
 
 		// On boucle tant que la solution n'a pas été trouvée
 		while(!end )
@@ -243,40 +243,50 @@ int gameLoopSDL(int hauteur,int largeur, char * pathBMPfile, int minRandom, int 
 									{
 										
 										//on initialise les variables permettant de récupérer les informations issues de la résolution
-										deplacement * tabDeplacements = NULL;
+										deplacement * tabDeplacements = (deplacement*)malloc(sizeof(deplacement) * 6000);
+										int i;
+										for (i = 0; i < 6000; i++)
+										{
+											tabDeplacements[i] = AUCUN;
+										}
 										unsigned long nbDeplacements = 0;
 										unsigned long nbSommetsParcourus = 0;
 										unsigned long timeElapsed = 0;
 
+										
+										
+
 										// On demande la résolution du taquin à l'ordinateur
-										if(solveTaquin(&(t.taquin),&tabDeplacements,&nbDeplacements, &nbSommetsParcourus, &timeElapsed, 0, t.pWindow))
+										if (solveTaquin(&(t.taquin), &tabDeplacements, &nbDeplacements, &nbSommetsParcourus, &timeElapsed, 0, t.pWindow))
 										{
 											// Si on a trouvé une solution on affiche les informations issues de la résolution
 											unsigned long i;
 											int res = 0;
-											printf("Nombre de deplacements = %d\n",nbDeplacements);
-											printf("Nombre de sommets parcourus = %d\n",nbSommetsParcourus);
-											printf("Temps ecoule = %d ms\n",timeElapsed);
+											printf("Nombre de deplacements = %d\n", nbDeplacements);
+											printf("Nombre de sommets parcourus = %d\n", nbSommetsParcourus);
+											printf("Temps ecoule = %d ms\n", timeElapsed);
 
 											// On affiche la solution étape par étape
-											for(i=0; i < nbDeplacements; i++)
+											for (i = 0; i < nbDeplacements; i++)
 											{
 												// On effectue le déplacement, on affiche le nouveau plateau et on attend un appui sur une touche pour continuer
-												if(tabDeplacements[i]!=AUCUN)
+												if (tabDeplacements[i] != AUCUN)
 												{
-													if(moveTaquin(&(t.taquin),tabDeplacements[i])) displayTaquinSDL(&t);
+													if (moveTaquin(&(t.taquin), tabDeplacements[i])) displayTaquinSDL(&t);
 													else break;
 												}
 											}
 										}
 										// Si la résolution n'a pas fonctionné, on affiche le taquin tel qu'il était avant résolution (on efface l'icone de "progression" si elle avait été dessinée)
 										else displayTaquinSDL(&t);
+											
 
 										if(tabDeplacements) 
 										{
 											free(tabDeplacements);
 											tabDeplacements = NULL;
 										}
+										initTaquin(&t.taquin);
 									}
 
 									break;

@@ -214,6 +214,11 @@ int solveTaquin(Taquin *pTaquin, deplacement ** pTabDeplacement, unsigned long *
 	ptrListAStar HeadClose = NULL;
 	while (mana != 0)
 	{
+		displayTaquin(pTaquin, 100);//////////////////////////////////affichage
+		
+
+		printf("\n");
+
 		ptrListAStar Playing = createNodeList(HeadOpen->Current, HeadOpen->DfromStart, HeadOpen->Heur, HeadOpen->LastD, HeadOpen->LastNode);
 		ptrListAStar Close = popList(&HeadOpen);
 		insertList(&HeadClose, Close, 0);
@@ -266,6 +271,8 @@ int solveTaquin(Taquin *pTaquin, deplacement ** pTabDeplacement, unsigned long *
 		createTaquin(pTaquinD, pTaquinD->hauteur, pTaquinD->largeur);
 		copyTaquin(pTaquin, pTaquinD);
 		////////////////////////////////////////////////////////////////////////////////
+
+		
 
 		g++;
 		//Haut
@@ -335,6 +342,7 @@ int solveTaquin(Taquin *pTaquin, deplacement ** pTabDeplacement, unsigned long *
 			}
 			HandlerC = NULL;
 			HandlerO = NULL;
+
 		}
 		//free(Playing);
 		pTaquin = HeadOpen->Current;
@@ -354,7 +362,7 @@ int solveTaquin(Taquin *pTaquin, deplacement ** pTabDeplacement, unsigned long *
 		}
 		if (mana == 0)
 		{
-			system("pause");
+			//system("pause");
 			break;
 		}
 	}
@@ -379,6 +387,7 @@ int h(Taquin * pTaquin)
 			dx = abs(i - th);
 			dy = abs(j - tl);
 			mana += dx + dy;
+			
 		}
 	}
 	return mana;

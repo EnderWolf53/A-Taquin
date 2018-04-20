@@ -349,7 +349,7 @@ int endTaquin(Taquin * pTaquin)
 
 	if (nbbonneCase == pTaquin->hauteur*pTaquin->largeur)//si le nombre de bonne case est égale a toute les cases du taquin alors le taquin est résolu
 	{
-		printf("\nBRAVO VOUS AVEZ RESOLU LE QUATIN\n");
+		printf("\nBRAVO VOUS AVEZ RESOLU LE TAQUIn\n");
 		return 1;
 	}
 
@@ -368,6 +368,7 @@ int displayTaquin(Taquin * pTaquin, int offset)
 
 	for (int i = 0; i < pTaquin->largeur; i++) 
 	{
+		printf("                    ");
 		for (int j = 0; j < pTaquin->hauteur; j++)
 		{
 			printf("%2d ", pTaquin->plateau[i][j]);//on affiche le tablea
@@ -381,8 +382,14 @@ int displayTaquin(Taquin * pTaquin, int offset)
 // Fonction pour libérer les zones mémoires occupées par un taquin
 int freeTaquin(Taquin * pTaquin)
 {
-
-	return 1;
+	int i;
+	for (i = 0; i < pTaquin->hauteur; i++)
+	{
+		free(pTaquin->plateau[i]);
+	}
+	free(pTaquin->plateau);
+	//free(pTaquin);
+	return 0;
 }
 //Boucle de jeu
 
@@ -413,26 +420,19 @@ int gameLoop(int hauteur, int largeur, int minRandom, int maxRandom)
 	pTaquin->x = 0;
 	pTaquin->y = 0;
 
+	printf("Voici le taquin : \n");
+
 	createTaquin(pTaquin, hauteur, largeur);
-
-	Taquin * pTaquin2 = (Taquin*)malloc(sizeof(Taquin));//creation taquin 2
-	pTaquin2->plateau = NULL;
-	pTaquin2->hauteur = hauteur;
-	pTaquin2->largeur = largeur;
-	pTaquin2->x = 0;
-	pTaquin2->y = 0;
-
-	createTaquin(pTaquin2, hauteur, largeur);
-
-	copyTaquin(pTaquin, pTaquin2); //test de copie
-	equalTaquin(pTaquin, pTaquin2);//test de equal
-
-	printf("TAKIN 1 : \n");
 	displayTaquin(pTaquin, offset);//test display
 
-
+	printf("maintenant melangeons le : \n");
 	mixTaquin(pTaquin, minRandom, maxRandom);//mélange du takin
-	
+	displayTaquin(pTaquin, offset);//test display
+
+	printf("Utilisez les touches 'z''q''s''d' pour resoudre ce taquin puis valider votre choix avec entree. \nEt si vous voulez qu'une ia le fasse a votre place utilisez la touche 'a' pour activer le AStar.\n");
+
+
+
 	deplacement* Deplacements = (deplacement*)malloc(sizeof(deplacement) * 1024);
 	int i;
 	for (i = 0; i < 1024; i++)
@@ -444,9 +444,9 @@ int gameLoop(int hauteur, int largeur, int minRandom, int maxRandom)
 	// BOUCLE DE JEU ! A DEVELOPPER
 	while (fin != 1)
 	{
-		
+
 		keyword = 0;
-				
+
 		scanf("%c", &keyword);//action
 		viderBuffer();
 
@@ -461,10 +461,16 @@ int gameLoop(int hauteur, int largeur, int minRandom, int maxRandom)
 
 		if (keyword == 'd')
 			d = DROITE;
+		if (keyword == 'e')
+		{
+			freeTaquin(pTaquin);
+			free(Deplacements);
+			return 1;
+		}
 		if (keyword == 'a')
 		{
-			int g =	solveTaquin(pTaquin, &Deplacements, &nbdeplacements, &nbtaquins, &nbtemps, 0, NULL);
-		/*	ptrListAStar Headopan = createNodeList(pTaquin, 0, 0, AUCUN, NULL);
+			int g = solveTaquin(pTaquin, &Deplacements, &nbdeplacements, &nbtaquins, &nbtemps, 0, NULL);
+			/*	ptrListAStar Headopan = createNodeList(pTaquin, 0, 0, AUCUN, NULL);
 			ptrListAStar Head2 = createNodeList(pTaquin, 1, 1, DROITE, Headopan);
 			ptrListAStar Head3 = createNodeList(pTaquin, 2, 2, HAUT, Head2);
 			insertList(&Headopan, Head2, 1);
@@ -474,23 +480,36 @@ int gameLoop(int hauteur, int largeur, int minRandom, int maxRandom)
 			printf("test : \n");
 			nbtemps = displayList(Headopan, 1);*/
 			d = AUCUN;
-			printf("Astar lance %d fois, generant moins de %d Taquins et ayant utilisés %d noeuds de liste\n", g, nbtaquins, nbdeplacements);
+			printf("Astar lance %d fois, generant moins de %d Taquins et ayant utilisés %d coups\n", nbdeplacements, nbtaquins, g);
 			system("pause");
+			for (i = 0; i < 1024; i++)
+			{
+				if (Deplacements[i] == AUCUN)
+				{
+					printf("\n");
+					break;
+				}
+				printf("%d ", Deplacements[i]);
+			}
 		}
-			
+
 		//system("cls");
 
 		moveTaquin(pTaquin, d);
 
-		displayTaquin(pTaquin,100);//test display
+		displayTaquin(pTaquin, 100);//test display
 		fin = endTaquin(pTaquin);
 
-		
+
 
 	}
+	freeTaquin(pTaquin);
+	free(Deplacements);
 	return 1;
 
-	
 
 }
+
+
+
 
