@@ -67,7 +67,7 @@ int equalTaquin(Taquin * pTaquin1, Taquin * pTaquin2)
 	if (!pTaquin1)//error
 	{
 		printf("error pTaquin1 n'existe pas\n");
-		return 0;
+		return -1;
 	}
 	if (!pTaquin2)//error
 	{
@@ -75,7 +75,7 @@ int equalTaquin(Taquin * pTaquin1, Taquin * pTaquin2)
 		return -1;
 	}
 	if ((pTaquin1->hauteur != pTaquin2->hauteur) || (pTaquin1->largeur != pTaquin2->largeur))
-		return -1;
+		return 0;
 
 	int CaseValide = 0;
 
@@ -94,12 +94,12 @@ int equalTaquin(Taquin * pTaquin1, Taquin * pTaquin2)
 
 	if (CaseValide == pTaquin1->hauteur * pTaquin1->largeur)// si le nombre de case valide est égaux a toute les case du taquin alors elle sont egaux
 	{
-		printf("les 2 taquins sont egaux\n");//test
+	//	printf("les 2 taquins sont egaux\n");//test
 			return 1;
 	}
 			
 	
-	printf("les 2 taquins ne sont pas egaux\n");//test
+//	printf("les 2 taquins ne sont pas egaux\n");//test
 	
 	return 0;
 }
@@ -168,7 +168,7 @@ int initTaquin(Taquin * pTaquin)
 {
 	//printf("init\n");//test
 
-	if (!pTaquin)//error
+	if (pTaquin == NULL)//error
 	{
 		printf("error pTaquin n'existe pas\n");
 		return -1;
@@ -191,7 +191,7 @@ int mixTaquin(Taquin * pTaquin, int minRandom, int maxRandom)
 {
 	//printf("MixTaquin");//test
 
-	if (!pTaquin)//error
+	if (pTaquin == NULL)//error
 	{
 		printf("error pTaquin n'existe pas\n");
 		return -1;
@@ -226,8 +226,7 @@ int mixTaquin(Taquin * pTaquin, int minRandom, int maxRandom)
 // Fonction qui permet de bouger une pièce du taquin (en bougeant la case vide)
 int moveTaquin(Taquin * pTaquin, deplacement d)
 {
-
-	if (!pTaquin)//error
+	if (pTaquin == NULL)//error
 	{
 		printf("error pTaquin n'existe pas\n");
 		return -1;
@@ -241,12 +240,13 @@ int moveTaquin(Taquin * pTaquin, deplacement d)
 	{
 		if (pTaquin->x - 1 < 0) // test d'erreur
 		{
-			//printf("impossibe de desplacer vers le haut\n");
+		//	printf("impossibe de desplacer vers le haut\n");
 			return 0;
 		}
 
+		//pTaquin->plateau[pTaquin->x][pTaquin->y];//la case vide
 		Tmp = pTaquin->plateau[pTaquin->x - 1][pTaquin->y];//la case du haut
-		pTaquin->plateau[pTaquin->x-1][pTaquin->y] = 0;//la case de haut devient la case vide
+		pTaquin->plateau[pTaquin->x-1][pTaquin->y] = pTaquin->plateau[pTaquin->x][pTaquin->y];//la case de haut devient la case vide
 		pTaquin->plateau[pTaquin->x][pTaquin->y] = Tmp;//la case vide devient la case du haut
 		
 		pTaquin->x--;
@@ -257,12 +257,13 @@ int moveTaquin(Taquin * pTaquin, deplacement d)
 	{
 		if (pTaquin->x + 1 >= pTaquin->hauteur) // test d'erreur
 		{
-			//printf("impossibe de deplacer vers le bas\n");
+		//	printf("impossibe de deplacer vers le bas\n");
 			return 0;
 		}
 
+		pTaquin->plateau[pTaquin->x][pTaquin->y];//la case vide
 		Tmp = pTaquin->plateau[pTaquin->x + 1][pTaquin->y];//la case du bas
-		pTaquin->plateau[pTaquin->x + 1][pTaquin->y] = 0;//la case de bas devient la case vide
+		pTaquin->plateau[pTaquin->x + 1][pTaquin->y] = pTaquin->plateau[pTaquin->x][pTaquin->y];//la case de bas devient la case vide
 		pTaquin->plateau[pTaquin->x][pTaquin->y] = Tmp;//la case vide devient la case du bas
 
 		pTaquin->x++;
@@ -272,12 +273,13 @@ int moveTaquin(Taquin * pTaquin, deplacement d)
 	{
 		if (pTaquin->y - 1 < 0) // test d'erreur
 		{
-			//printf("impossibe de deplacer vers la gauche\n");
+		//	printf("impossibe de deplacer vers la gauche\n");
 			return 0;
 		}
 
+		pTaquin->plateau[pTaquin->x][pTaquin->y];//la case vide
 		Tmp = pTaquin->plateau[pTaquin->x][pTaquin->y-1];//la case de gauche
-		pTaquin->plateau[pTaquin->x][pTaquin->y-1] = 0;//la case de gauche devient la case vide
+		pTaquin->plateau[pTaquin->x][pTaquin->y-1] = pTaquin->plateau[pTaquin->x][pTaquin->y];//la case de gauche devient la case vide
 		pTaquin->plateau[pTaquin->x][pTaquin->y] = Tmp;//la case vide devient la case de gauche
 
 		pTaquin->y--;
@@ -287,18 +289,19 @@ int moveTaquin(Taquin * pTaquin, deplacement d)
 	{
 		if (pTaquin->y + 1 >= pTaquin->largeur) // test d'erreur
 		{
-			//printf("impossibe de deplacer vers la droite\n");
+		//	printf("impossibe de deplacer vers la droite\n");
 			return 0;
 		}
 
-
+		pTaquin->plateau[pTaquin->x][pTaquin->y];//la case vide
 		Tmp = pTaquin->plateau[pTaquin->x][pTaquin->y+1];//la case de droite
-		pTaquin->plateau[pTaquin->x][pTaquin->y+1] = 0;//la case de droite devient la case vide
+		pTaquin->plateau[pTaquin->x][pTaquin->y+1] = pTaquin->plateau[pTaquin->x][pTaquin->y];//la case de droite devient la case vide
 		pTaquin->plateau[pTaquin->x][pTaquin->y] = Tmp;//la case vide devient la case de droite
 
 		pTaquin->y++;
 	}
 
+	
 	
 	return 1;
 }
@@ -346,7 +349,7 @@ int endTaquin(Taquin * pTaquin)
 
 	if (nbbonneCase == pTaquin->hauteur*pTaquin->largeur)//si le nombre de bonne case est égale a toute les cases du taquin alors le taquin est résolu
 	{
-		printf("\nBRAVO VOUS AVEZ RESOLU LE TAQUIN\n");
+		printf("\nBRAVO VOUS AVEZ RESOLU LE QUATIN\n");
 		return 1;
 	}
 
@@ -378,8 +381,14 @@ int displayTaquin(Taquin * pTaquin, int offset)
 // Fonction pour libérer les zones mémoires occupées par un taquin
 int freeTaquin(Taquin * pTaquin)
 {
-
-	return 1;
+	int i;
+	for (i = 0; i < pTaquin->hauteur; i++)
+	{
+		free(pTaquin->plateau[i]);
+	}
+	free(pTaquin->plateau);
+	//free(pTaquin);
+	return 0;
 }
 //Boucle de jeu
 
@@ -412,24 +421,15 @@ int gameLoop(int hauteur, int largeur, int minRandom, int maxRandom)
 
 	createTaquin(pTaquin, hauteur, largeur);
 
-	Taquin * pTaquin2 = (Taquin*)malloc(sizeof(Taquin));//creation taquin 2
-	pTaquin2->plateau = NULL;
-	pTaquin2->hauteur = hauteur;
-	pTaquin2->largeur = largeur;
-	pTaquin2->x = 0;
-	pTaquin2->y = 0;
-
-	createTaquin(pTaquin2, hauteur, largeur);
-
-	copyTaquin(pTaquin, pTaquin2); //test de copie
-	equalTaquin(pTaquin, pTaquin2);//test de equal
-
-	printf("TAKIN 1 : \n");
-	displayTaquin(pTaquin, offset);//test display
-
-
 	mixTaquin(pTaquin, minRandom, maxRandom);//mélange du takin
 	
+	deplacement* Deplacements = (deplacement*)malloc(sizeof(deplacement) * 1024);
+	int i;
+	for (i = 0; i < 1024; i++)
+	{
+		Deplacements[i] = AUCUN;
+	}
+	int nbdeplacements = 0, nbtaquins = 0, nbtemps = 0;
 
 	// BOUCLE DE JEU ! A DEVELOPPER
 	while (fin != 1)
@@ -451,9 +451,37 @@ int gameLoop(int hauteur, int largeur, int minRandom, int maxRandom)
 
 		if (keyword == 'd')
 			d = DROITE;
-
-		if (keyword == 'w')
-			d = cancelMove(d);
+		if (keyword == 'e')
+		{
+			freeTaquin(pTaquin);
+			free(Deplacements);
+			return 1;
+		}
+		if (keyword == 'a')
+		{
+			int g =	solveTaquin(pTaquin, &Deplacements, &nbdeplacements, &nbtaquins, &nbtemps, 0, NULL);
+		/*	ptrListAStar Headopan = createNodeList(pTaquin, 0, 0, AUCUN, NULL);
+			ptrListAStar Head2 = createNodeList(pTaquin, 1, 1, DROITE, Headopan);
+			ptrListAStar Head3 = createNodeList(pTaquin, 2, 2, HAUT, Head2);
+			insertList(&Headopan, Head2, 1);
+			printf("test : \n");
+			nbtemps = displayList(Headopan, 1);
+			insertList(&Headopan, Head3, 1);
+			printf("test : \n");
+			nbtemps = displayList(Headopan, 1);*/
+			d = AUCUN;
+			printf("Astar lance %d fois, generant moins de %d Taquins et ayant utilisés %d coups\n", nbdeplacements, nbtaquins, g);
+			system("pause");
+			for (i = 0; i < 1024; i++)
+			{
+				if (Deplacements[i] == AUCUN)
+				{
+					printf("\n");
+					break;
+				}
+				printf("%d ", Deplacements[i]);
+			}
+		}
 			
 		//system("cls");
 
@@ -465,8 +493,9 @@ int gameLoop(int hauteur, int largeur, int minRandom, int maxRandom)
 		
 
 	}
+	freeTaquin(pTaquin);
+	free(Deplacements);
 	return 1;
-
 	
 
 }

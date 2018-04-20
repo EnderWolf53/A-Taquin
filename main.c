@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "taquinSDL.h"
+#include "Taquin.h"
+#include "AStar.h"
 
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
@@ -148,7 +150,6 @@ int main(int argc, char ** argv)
 				
 				//testfin---------------------------------------------------------------------------------------------------------/*/
 
-
 				gameLoop(hauteur, largeur, minRandom, maxRandom);
 
 
@@ -158,7 +159,7 @@ int main(int argc, char ** argv)
 				// En mode console
 				//gameLoop(hauteur,largeur, minRandom,maxRandom);
 				// En mode graphique
-				gameLoopSDL(hauteur,largeur,taquinFile, minRandom, maxRandom);
+				//gameLoopSDL(hauteur,largeur,taquinFile, minRandom, maxRandom);
 
 			}
 

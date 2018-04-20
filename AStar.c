@@ -20,7 +20,8 @@ ptrListAStar createNodeList(Taquin * pTaquin, int gValue, int fValue, deplacemen
 	Anode->Heur = fValue;
 	Anode->Current = pTaquin;
 	Anode->LastD = d;
-	Anode->LastNode = pPrevPlay;
+	Anode->LastPlay = pPrevPlay;
+	Anode->LastNode = NULL;
 	Anode->NextNode = NULL;
 	return Anode;
 }
@@ -29,7 +30,7 @@ int fpg(ptrListAStar called)
 {
 	if (!called)
 	{
-		return -1;
+		return INT_MAX;
 	}
 	return (called->DfromStart + called->Heur);
 }
@@ -42,45 +43,60 @@ int insertList(ptrListAStar * ppHead, ptrListAStar pNode, int tri)
 	{
 		return -1;
 	}
-	if (!(*ppHead))
-	{
-		return -1;
-	}
 	if (!pNode)
 	{
 		return -1;
 	}
+	if (!(*ppHead))
+	{
+		(*ppHead) = pNode;
+		return 0;
+	}
+	int st = 1;
+	ptrListAStar tmp = (*ppHead);
 	if (tri == 0) //insert en tête
 	{
 		pNode->NextNode = (*ppHead);
 		(*ppHead)->LastNode = pNode;
+		(*ppHead) = pNode;
 	}
 	else //insert selon F+G
 	{
 		if (fpg(pNode) < fpg((*ppHead)))
 		{
-			pNode->NextNode = (*ppHead);
-			(*ppHead)->LastNode = pNode;
-		}
-		else
-		{
-			pNode->LastNode = (*ppHead);
-			if (!(*ppHead)->NextNode)
+			if (!(*ppHead)->LastNode)
 			{
-				(*ppHead)->NextNode = pNode;
-			}
-			else if (fpg(pNode) < fpg((*ppHead)->NextNode))
-			{
-				(*ppHead)->NextNode->LastNode = pNode;
-				pNode->NextNode = (*ppHead)->NextNode;
-				(*ppHead)->NextNode = pNode;
 			}
 			else
 			{
-				return insertList(&((*ppHead)->NextNode), pNode, tri);
+				pNode->LastNode = (*ppHead)->LastNode;
+				(*ppHead)->LastNode->NextNode = pNode;
+			}
+			pNode->NextNode = (*ppHead);
+			(*ppHead)->LastNode = pNode;
+			(*ppHead) = pNode;
+			st = 0;
+		}
+		else
+		{
+			if (!(*ppHead)->NextNode)
+			{
+				(*ppHead)->NextNode = pNode;
+				pNode->LastNode = (*ppHead);
+			}
+			else
+			{
+				while (fpg(pNode) >= fpg(tmp->NextNode))
+				{
+					tmp = tmp->NextNode;
+				}
+				pNode->LastNode = tmp;
+				tmp->NextNode = pNode;
 			}
 		}
+		
 	}
+	(*ppHead)->LastNode = NULL;
 	return 0;
 }
 
@@ -106,19 +122,13 @@ ptrListAStar popList(ptrListAStar * ppHead)
 	if (!(*ppHead)->NextNode)
 	{
 		free((*ppHead));
+		(*ppHead) = NULL;
 	}
 	else
 	{
-		ptrListAStar tmp = (ptrListAStar)malloc(sizeof(ListAStar));
-		tmp->Current = (*ppHead)->NextNode->Current;
-		tmp->DfromStart = (*ppHead)->NextNode->DfromStart;
-		tmp->Heur = (*ppHead)->NextNode->Heur;
-		tmp->LastD = (*ppHead)->NextNode->LastD;
-		tmp->LastNode = (*ppHead)->NextNode->LastNode;
-		tmp->NextNode = (*ppHead)->NextNode->NextNode;
-		free((*ppHead)->NextNode);
-		free((*ppHead));
-		(*ppHead) = tmp;
+		(*ppHead) = (*ppHead)->NextNode;
+		free((*ppHead)->LastNode);
+		(*ppHead)->LastNode = NULL;
 	}
 	return poped;
 }
@@ -139,13 +149,23 @@ ptrListAStar * isInList(ptrListAStar * ppHead, Taquin * pTaquin)
 	{
 		return NULL;
 	}
-	if (equalTaquin((*ppHead)->Current, pTaquin))
+	ptrListAStar tmp = (ptrListAStar)malloc(sizeof(ListAStar));
+	tmp->Current = (*ppHead)->Current;
+	tmp->DfromStart = (*ppHead)->DfromStart;
+	tmp->Heur = (*ppHead)->Heur;
+	tmp->LastD = (*ppHead)->LastD;
+	tmp->LastNode = (*ppHead)->LastNode;
+	tmp->NextNode = (*ppHead)->NextNode;
+	while (tmp->NextNode != NULL)
 	{
-		return ppHead;
-	}
-	else
-	{
-		return isInList(&((*ppHead)->NextNode), pTaquin);
+		if (equalTaquin(tmp->Current, pTaquin) == 1)
+		{
+			return &tmp;
+		}
+		else
+		{
+			tmp = tmp->NextNode;
+		}
 	}
 	return NULL;
 }
@@ -171,6 +191,37 @@ int displayList(ptrListAStar pHead, int displayFGH)
 	return displayList(pHead->NextNode, displayFGH);
 }
 
+int FreeList(ptrListAStar *ppHead, int security)
+{
+	if (!ppHead)
+	{
+		return -1;
+	}
+	if (!(*ppHead))
+	{
+		return 0;
+	}
+	if (security)
+	{
+		while ((*ppHead)->NextNode != NULL)
+		{
+			ptrListAStar buffer = popList(ppHead);
+			freeTaquin(buffer->Current);
+			free(buffer);
+		}
+	}
+	else
+	{
+		while ((*ppHead) != NULL)
+		{
+			ptrListAStar buffer = popList(ppHead);
+			freeTaquin(buffer->Current);
+			free(buffer);
+		}
+	}
+	return 0;
+}
+
 // Fonction pour résoudre le taquin en utilisant l'algorithme A*
 // La fonction prend comme taquin initial le taquin spécifié par pTaquin
 // elle remplit 
@@ -182,54 +233,82 @@ int displayList(ptrListAStar pHead, int displayFGH)
 // pWindow
 int solveTaquin(Taquin *pTaquin, deplacement ** pTabDeplacement, unsigned long *pNbDeplacements, unsigned long * pNbTaquinsGeneres, unsigned long * pTimeElapsed, int stepByStep, SDL_Surface * pWindow)
 {
+	//TODO : Faire le choix du prochain noeud.
 	if ((!pTaquin) || (!pTabDeplacement) || (!(*pTabDeplacement)) || (!pNbDeplacements) || (!pNbTaquinsGeneres) || (!pTimeElapsed))
 	{
 		return -1;
 	}
 	int verifier[4] = { 0,0,0,0 };
 	int g = 0;
-	int mana = INT_MAX;
-	ptrListAStar HeadOpen = createNodeList(pTaquin, g, h(pTaquin), AUCUN, NULL); //taquin actuel
+	int mana = INT_MAX, off = 0;
+	// Copie du taquin de départ
+	Taquin * Copy = (Taquin*)malloc(sizeof(Taquin));//creation taquin Haut
+	Copy->plateau = NULL;
+	Copy->hauteur = pTaquin->hauteur;
+	Copy->largeur = pTaquin->largeur;
+	Copy->x = 0;
+	Copy->y = 0;
+	createTaquin(Copy, Copy->hauteur, Copy->largeur);
+	copyTaquin(pTaquin, Copy);
+	////
+	ptrListAStar HeadOpen = createNodeList(pTaquin, g, h(pTaquin), AUCUN, NULL); //taquin actuel;
 	ptrListAStar HeadClose = NULL;
-
-	Taquin * pTaquinN = (Taquin*)malloc(sizeof(Taquin));//creation taquin Haut
-	pTaquinN->plateau = NULL;
-	pTaquinN->hauteur = pTaquin->hauteur;
-	pTaquinN->largeur = pTaquin->largeur;
-	pTaquinN->x = 0;
-	pTaquinN->y = 0;
-	createTaquin(pTaquinN, pTaquinN->hauteur, pTaquinN->largeur);
-	copyTaquin(pTaquin, pTaquinN);
-
-	Taquin * pTaquinS = (Taquin*)malloc(sizeof(Taquin));//creation taquin Bas
-	pTaquinS->plateau = NULL;
-	pTaquinS->hauteur = pTaquin->hauteur;
-	pTaquinS->largeur = pTaquin->largeur;
-	pTaquinS->x = 0;
-	pTaquinS->y = 0;
-	createTaquin(pTaquinS, pTaquinS->hauteur, pTaquinS->largeur);
-	copyTaquin(pTaquin, pTaquinS);
-
-	Taquin * pTaquinG = (Taquin*)malloc(sizeof(Taquin));//creation taquin Gauche
-	pTaquinG->plateau = NULL;
-	pTaquinG->hauteur = pTaquin->hauteur;
-	pTaquinG->largeur = pTaquin->largeur;
-	pTaquinG->x = 0;
-	pTaquinG->y = 0;
-	createTaquin(pTaquinG, pTaquinG->hauteur, pTaquinG->largeur);
-	copyTaquin(pTaquin, pTaquinG);
-
-	Taquin * pTaquinD = (Taquin*)malloc(sizeof(Taquin));//creation taquin Droite
-	pTaquinD->plateau = NULL;
-	pTaquinD->hauteur = pTaquin->hauteur;
-	pTaquinD->largeur = pTaquin->largeur;
-	pTaquinD->x = 0;
-	pTaquinD->y = 0;
-	createTaquin(pTaquinD, pTaquinD->hauteur, pTaquinD->largeur);
-	copyTaquin(pTaquin, pTaquinD);
+	int p = 0;
 	while (mana != 0)
 	{
+		ptrListAStar Playing = createNodeList(HeadOpen->Current, HeadOpen->DfromStart, HeadOpen->Heur, HeadOpen->LastD, HeadOpen->LastNode);
+		ptrListAStar Close = popList(&HeadOpen);
+		insertList(&HeadClose, Close, 0);
 		mana = h(pTaquin);
+		//off = displayTaquin(pTaquin, 0);
+		/*printf("openlist precopy:\n");
+		off = displayList(HeadOpen, 1);
+		system("pause");
+		copyTaquin(pTaquin, pTaquinD);
+		copyTaquin(pTaquin, pTaquinG);
+		copyTaquin(pTaquin, pTaquinS);
+		copyTaquin(pTaquin, pTaquinN);
+		printf("openlist postcopy:\n");
+		off = displayList(HeadOpen, 1);
+		system("pause");*/
+		///////////////////////////////////////////////////////////////////////////////
+		Taquin * pTaquinN = (Taquin*)malloc(sizeof(Taquin));//creation taquin Haut
+		pTaquinN->plateau = NULL;
+		pTaquinN->hauteur = pTaquin->hauteur;
+		pTaquinN->largeur = pTaquin->largeur;
+		pTaquinN->x = 0;
+		pTaquinN->y = 0;
+		createTaquin(pTaquinN, pTaquinN->hauteur, pTaquinN->largeur);
+		copyTaquin(pTaquin, pTaquinN);
+
+		Taquin * pTaquinS = (Taquin*)malloc(sizeof(Taquin));//creation taquin Bas
+		pTaquinS->plateau = NULL;
+		pTaquinS->hauteur = pTaquin->hauteur;
+		pTaquinS->largeur = pTaquin->largeur;
+		pTaquinS->x = 0;
+		pTaquinS->y = 0;
+		createTaquin(pTaquinS, pTaquinS->hauteur, pTaquinS->largeur);
+		copyTaquin(pTaquin, pTaquinS);
+
+		Taquin * pTaquinG = (Taquin*)malloc(sizeof(Taquin));//creation taquin Gauche
+		pTaquinG->plateau = NULL;
+		pTaquinG->hauteur = pTaquin->hauteur;
+		pTaquinG->largeur = pTaquin->largeur;
+		pTaquinG->x = 0;
+		pTaquinG->y = 0;
+		createTaquin(pTaquinG, pTaquinG->hauteur, pTaquinG->largeur);
+		copyTaquin(pTaquin, pTaquinG);
+
+		Taquin * pTaquinD = (Taquin*)malloc(sizeof(Taquin));//creation taquin Droite
+		pTaquinD->plateau = NULL;
+		pTaquinD->hauteur = pTaquin->hauteur;
+		pTaquinD->largeur = pTaquin->largeur;
+		pTaquinD->x = 0;
+		pTaquinD->y = 0;
+		createTaquin(pTaquinD, pTaquinD->hauteur, pTaquinD->largeur);
+		copyTaquin(pTaquin, pTaquinD);
+		////////////////////////////////////////////////////////////////////////////////
+
 		g++;
 		//Haut
 		verifier[0] = moveTaquin(pTaquinN, HAUT);
@@ -241,67 +320,118 @@ int solveTaquin(Taquin *pTaquin, deplacement ** pTabDeplacement, unsigned long *
 			{
 				if (!HandlerC)
 				{
-					ptrListAStar Haut = createNodeList(pTaquinN, g, h(pTaquin), HAUT, HeadOpen);
+					ptrListAStar Haut = createNodeList(pTaquinN, g, h(pTaquinN), HAUT, Playing);
 					insertList(&HeadOpen, Haut, 1);
 				}
 			}
+			HandlerC = NULL;
+			HandlerO = NULL;
 		}
 		//Droite
 		verifier[1] = moveTaquin(pTaquinD, DROITE);
 		if (verifier[1] == 1)
 		{
-			ptrListAStar * HandlerO = isInList(&HeadOpen, pTaquinN);
-			ptrListAStar * HandlerC = isInList(&HeadClose, pTaquinN);
+			ptrListAStar * HandlerO = isInList(&HeadOpen, pTaquinD);
+			ptrListAStar * HandlerC = isInList(&HeadClose, pTaquinD);
 			if (!HandlerO)
 			{
 				if (!HandlerC)
 				{
-					ptrListAStar Droite = createNodeList(pTaquinD, g, h(pTaquin), DROITE, HeadOpen);
+					ptrListAStar Droite = createNodeList(pTaquinD, g, h(pTaquinD), DROITE, Playing);
 					insertList(&HeadOpen, Droite, 1);
 				}
 			}
+			HandlerC = NULL;
+			HandlerO = NULL;
 		}
 		//Bas
 		verifier[2] = moveTaquin(pTaquinS, BAS);
 		if (verifier[2] == 1)
 		{
-			ptrListAStar * HandlerO = isInList(&HeadOpen, pTaquinN);
-			ptrListAStar * HandlerC = isInList(&HeadClose, pTaquinN);
+			ptrListAStar * HandlerO = isInList(&HeadOpen, pTaquinS);
+			ptrListAStar * HandlerC = isInList(&HeadClose, pTaquinS);
 			if (!HandlerO)
 			{
 				if (!HandlerC)
 				{
-					ptrListAStar Bas = createNodeList(pTaquinS, g, h(pTaquin), BAS, HeadOpen);
+					ptrListAStar Bas = createNodeList(pTaquinS, g, h(pTaquinS), BAS, Playing);
 					insertList(&HeadOpen, Bas, 1);
 				}
 			}
+			HandlerC = NULL;
+			HandlerO = NULL;
 		}
 		//Gauche
 		verifier[3] = moveTaquin(pTaquinG, GAUCHE);
 		if (verifier[3] == 1)
 		{
-			ptrListAStar * HandlerO = isInList(&HeadOpen, pTaquinN);
-			ptrListAStar * HandlerC = isInList(&HeadClose, pTaquinN);
+			ptrListAStar * HandlerO = isInList(&HeadOpen, pTaquinG);
+			ptrListAStar * HandlerC = isInList(&HeadClose, pTaquinG);
 			if (!HandlerO)
 			{
 				if (!HandlerC)
 				{
-					ptrListAStar Gauche = createNodeList(pTaquinG, g, h(pTaquin), GAUCHE, HeadOpen);
+					ptrListAStar Gauche = createNodeList(pTaquinG, g, h(pTaquinG), GAUCHE, Playing);
 					insertList(&HeadOpen, Gauche, 1);
 				}
 			}
+			HandlerC = NULL;
+			HandlerO = NULL;
 		}
-		if (g > 1)
+		//free(Playing);
+		pTaquin = HeadOpen->Current;
+		//(*pTabDeplacement)[g - 1] = HeadOpen->LastD;
+		(*pNbDeplacements)++;
+		(*pNbTaquinsGeneres) += 4;
+		if (stepByStep != 0)
 		{
-			ptrListAStar Close = popList(&HeadOpen);
-			insertList(&HeadClose, Close, 0);
+			//off = displayTaquin(pTaquin, off);
+			//printf("\n");
+			//printf("openlist :\n");
+			//off = displayList(HeadOpen, 1);
+			//printf("\ncloselist :\n");
+			//off = displayList(HeadClose, 1);
+			//system("pause");
+			//system("cls");
 		}
-		else
+		if (h(pTaquin) == 0)
 		{
-			HeadClose = popList(&HeadOpen);
+			int Totalmove = HeadOpen->DfromStart;
+			while (Totalmove != 0)
+			{
+				ptrListAStar* Search = isInList(&HeadOpen, pTaquin);
+				if (!Search)
+				{
+					ptrListAStar* SearchClose = isInList(&HeadClose, pTaquin);
+					if (!SearchClose)
+					{
+						printf("WARNING : missing move\n");
+						return -1;
+					}
+					else
+					{
+						(*pTabDeplacement)[p] = (*SearchClose)->LastD;
+						moveTaquin(pTaquin, cancelMove((*SearchClose)->LastD));
+						SearchClose = NULL;
+					}
+				}
+				else
+				{
+					(*pTabDeplacement)[p] = (*Search)->LastD;
+					moveTaquin(pTaquin, cancelMove((*Search)->LastD));
+					Search = NULL;
+				}
+				p++;
+				Totalmove--;
+			}
+			system("pause");
+			break;
 		}
 	}
-	return 0;
+	FreeList(&HeadOpen, 0);
+	FreeList(&HeadClose, 1);
+	freeTaquin(Copy);
+	return p;
 }
 
 // fonction d'évaluation pour la résolution avec AStar
