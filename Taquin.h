@@ -15,7 +15,7 @@
 // Nombre de cases maximum en largeur ou hauteur
 #define SIZE_MAXI	5
 // Nombre de cases minimum en largeur ou hauteur
-#define SIZE_MINI	3
+#define SIZE_MINI	2
 
 // Case vide, on définit la case vide comme étant la valeur 0, elle doit être en haut à gauche du taquin quand il est terminé
 #define VIDE 0
@@ -69,6 +69,6 @@ int freeTaquin(Taquin * pTaquin);
 // Boucle de jeu 
 int gameLoop(int hauteur,int largeur,int minRandom, int maxRandom);
 
-
+void viderBuffer();//vider buffer
 
 #endif
